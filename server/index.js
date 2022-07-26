@@ -1,4 +1,4 @@
-require('dotenv').config();
+require("dotenv").config();
 const express = require("express");
 const colors = require("colors");
 const { graphqlHTTP } = require("express-graphql");
@@ -10,9 +10,12 @@ const port = process.env.PORT || 5000;
 // Connect to MongoDB Database from config/db.js
 connectDB();
 
-app.use('/graphql', graphqlHTTP({
+app.use(
+  "/graphql",
+  graphqlHTTP({
     schema,
-    graphiql: process.env.NODE_ENV === 'development'
-}));
+    graphiql: process.env.NODE_ENV === "development",
+  })
+);
 app.get("/", (req, res) => res.send("Hello World!"));
 app.listen(port, () => console.log(`Server listening on port ${port}!`));
