@@ -21,7 +21,7 @@ const ProjectType = new GraphQLObjectType({
     client: {
       type: ClientType,
       resolve(parent, args) {
-        return clients.findById(parent.clientId);
+        return Client.findById(parent.clientId);
       },
     },
   }),
@@ -112,10 +112,10 @@ const mutation = new GraphQLObjectType({
           type: new GraphQLEnumType({
             name: "ProjectStatus",
             values: {
-              'new': { value: "Not started" },
-              'progress': { value: "In progress" },
-              'completed': { value: "completed" },
-             },
+              new: { value: "Not started" },
+              progress: { value: "In progress" },
+              completed: { value: "completed" },
+            },
           }),
           defaultValue: "Not started",
         },
@@ -129,6 +129,48 @@ const mutation = new GraphQLObjectType({
           clientId: args.clientId,
         });
         return project.save();
+      },
+    },
+    // Delete project from database
+    deleteProject: {
+      type: ProjectType,
+      args: {
+        id: { type: GraphQLNonNull(GraphQLID) },
+      },
+      resolve(parentValue, args) {
+        return Project.findByIdAndRemove(args.id);
+      },
+    },
+    // Update project in database
+    updateProject: {
+      type: ProjectType,
+      args: {
+        id: { type: GraphQLNonNull(GraphQLID) },
+        name: { type: GraphQLString },
+        description: { type: GraphQLString },
+        status: {
+          type: new GraphQLEnumType({
+            name: "ProjectStatusUpdated",
+            values: {
+              new: { value: "Not started" },
+              progress: { value: "In progress" },
+              completed: { value: "completed" },
+            },
+          }),
+        },
+      },
+      resolve(parentValue, args) {
+        return Project.findByIdAndUpdate(
+          args.id,
+          {
+            $set: {
+              name: args.name,
+              description: args.description,
+              status: args.status,
+            },
+          },
+          { new: true }
+        );
       },
     },
   },
